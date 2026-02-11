@@ -2,56 +2,59 @@ import { useState } from "react";
 import axios from "axios";
 import { FiSend, FiSmartphone, FiMessageSquare, FiLoader } from "react-icons/fi";
 
-const SendMessage = () => {
+const SendMessage = ({onMessageSent,role,setShowInvite,  setShowUsers}) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [messageText, setMessageText] = useState("");
   const [loading, setLoading] = useState(false);
   const [charCount, setCharCount] = useState(0);
 
-  const handleSend = async () => {
-    if (!phoneNumber || !messageText) {
-      alert("Please enter phone number and message");
+const handleSend = async () => {
+  if (!phoneNumber || !messageText) {
+    alert("Please enter phone number and message");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const formattedNumber = phoneNumber.replace(/\D/g, "");
+
+    // ✅ Optional validation
+    if (formattedNumber.length < 10) {
+      alert("Invalid phone number");
       return;
     }
 
-    try {
-      setLoading(true);
-      const formattedNumber = phoneNumber.replace(/\D/g, "");
-      
-      const token = localStorage.getItem("token");
-      const res = await axios.post(
-        "http://localhost:5000/api/send-message",
-        {
-          phoneNumber: formattedNumber,
-          messageText
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+    const res = await axios.post(
+      "http://localhost:5000/api/send-message",
+      {
+        phoneNumber: formattedNumber,
+        messageText
+      },
+      {
+        withCredentials: true   // ⭐ Cookie auth
+      }
+    );
 
-      console.log(res.data);
-      
-      // Success notification
-      alert("Message Sent ✅");
-      
-      // Clear fields after sending
-      setPhoneNumber("");
-      setMessageText("");
-      setCharCount(0);
+    console.log(res.data);
 
-    } catch (error) {
-      console.error(error);
-      alert(
-        error.response?.data?.message ||
-        "Message Failed ❌"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    alert("Message Sent ✅");
+
+    setPhoneNumber("");
+    setMessageText("");
+      if (onMessageSent) onMessageSent();
+    setCharCount(0);
+
+  } catch (error) {
+    console.error(error);
+    alert(
+      error.response?.data?.message ||
+      "Message Failed ❌"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleMessageChange = (e) => {
     const text = e.target.value;
@@ -192,6 +195,24 @@ const SendMessage = () => {
           >
             Clear Message
           </button>
+           {role === "admin" && (
+  <button
+    type="button"
+    onClick={() => setShowInvite(true)}
+    className="py-2 px-3 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg"
+  >
+    Send Invite
+  </button>
+)}
+<button
+  onClick={() => setShowUsers(true)}
+  className="bg-blue-500 text-white px-4 py-2 rounded"
+>
+  Users
+</button>
+
+
+
         </div>
       </div>
     </div>

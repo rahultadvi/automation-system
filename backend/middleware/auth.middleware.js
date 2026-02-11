@@ -1,31 +1,28 @@
 import { verifyJwtToken } from "../utils/jwt.js";
+import { findUserByEmail } from "../models/auth.model.js";
 
-export const authMiddleware = (req, res, next) => {
+export const authMiddleware = async (req, res, next) => {
+console.log("Cookies:", req.cookies);
+
   try {
 
-    // ✅ Authorization header se token lena
-    const authHeader = req.headers.authorization;
+    const token = req.cookies.token;
 
-    if (!authHeader) {
-      return res.status(401).json({ message: "Authorization header missing" });
-    }
-
-    // Format: Bearer TOKEN
-    const token = authHeader.split(" ")[1];
-
-    if (!token) {
+    if (!token)
       return res.status(401).json({ message: "Token missing" });
-    }
 
-    // ✅ Token verify
     const decoded = verifyJwtToken(token);
 
-    if (!decoded) {
-      return res.status(403).json({ message: "Invalid or expired token" });
-    }
+    if (!decoded)
+      return res.status(403).json({ message: "Invalid token" });
 
-    // ✅ User data request me store karna
-    req.user = decoded;
+    // ⭐ DB se fresh user lo
+    const user = await findUserByEmail(decoded.email);
+
+    if (!user)
+      return res.status(401).json({ message: "User not found" });
+
+    req.user = user;
 
     next();
 

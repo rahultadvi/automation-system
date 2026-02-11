@@ -5,20 +5,24 @@ import { saveMessageService } from "../services/message.service.js";
 
 // ⭐ Send Message
 export const sendMessageController = async (req, res) => {
+console.log("Decoded User:", req.user);
 
   try {
 
     const { phoneNumber, messageText } = req.body;
+       const { id: userId } = req.user;
 
     if (!phoneNumber || !messageText) {
       return res.status(400).json({
         message: "Phone number and message text are required"
       });
     }
+    
 
     const whatsappResponse = await sendWhatsAppMessage(phoneNumber, messageText);
 
     const savedMessage = await saveMessageService(
+       userId,
       phoneNumber,
       messageText,
       "sent",
@@ -49,20 +53,117 @@ export const getMessagesController = async (req, res) => {
 
   try {
 
-    const result = await pool.query(
-      "SELECT * FROM messages ORDER BY id DESC"
-    );
+    const { id, role } = req.user;
+
+    let result;
+
+    if (role === "admin") {
+
+      result = await pool.query(
+        "SELECT * FROM messages ORDER BY id DESC"
+      );
+
+    } else {
+
+      result = await pool.query(
+        "SELECT * FROM messages WHERE user_id=$1 ORDER BY id DESC",
+        [id]
+      );
+
+    }
 
     res.json(result.rows);
 
   } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      message: "Server Error"
-    });
-
+    res.status(500).json({ message: "Server Error" });
   }
+};
 
+export const getAdminMessages = async (req, res) => {
+  try {
+
+    if (!req.user)
+      return res.status(401).json({ message: "Unauthorized" });
+
+     // ⭐ SUPER ADMIN → sab messages
+    if (req.user.role === "super_admin") {
+
+      const messages = await pool.query(
+        `SELECT 
+            m.id,
+            m.phone_number,
+            m.message_text,
+            m.created_at AS timestamp,
+            u.email AS sender_email
+         FROM messages m
+         JOIN users u ON m.user_id = u.id
+         ORDER BY m.created_at DESC`
+      );
+
+      return res.json(messages.rows);
+    }
+
+    if (req.user.role !== "admin")
+      return res.status(403).json({ message: "Admin only" });
+
+    const messages = await pool.query(
+      `SELECT 
+          m.id,
+          m.phone_number,
+          m.message_text,
+          m.created_at AS timestamp,
+          u.email AS sender_email
+       FROM messages m
+       JOIN users u ON m.user_id = u.id
+       WHERE u.created_by = $1
+       ORDER BY m.created_at DESC`,
+      [req.user.id]
+    );
+
+    res.json(messages.rows);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getTeamMessages = async (req, res) => {
+  try {
+
+    if (!req.user)
+      return res.status(401).json({ message: "Unauthorized" });
+
+    let adminId;
+
+    if (req.user.role === "admin") {
+      adminId = req.user.id;
+    } else {
+
+      const user = await pool.query(
+        `SELECT created_by FROM users WHERE id = $1`,
+        [req.user.id]
+      );
+
+      adminId = user.rows[0].created_by;
+    }
+
+    const messages = await pool.query(
+      `
+      SELECT *
+      FROM messages
+      WHERE user_id = $1
+         OR user_id IN (
+            SELECT id FROM users WHERE created_by = $1
+         )
+      ORDER BY created_at DESC
+      `,
+      [adminId]
+    );
+
+    res.json(messages.rows);
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
 };

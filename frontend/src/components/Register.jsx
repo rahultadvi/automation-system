@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 const Register = ({ setShowLogin }) => {
@@ -7,6 +7,18 @@ const Register = ({ setShowLogin }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  
+
+const [inviteToken, setInviteToken] = useState("");
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("invite");
+
+  setInviteToken(token || "");
+}, []);
+
+
+
 
   const validatePasswords = () => {
     if (password !== confirmPassword) {
@@ -21,30 +33,30 @@ const Register = ({ setShowLogin }) => {
     return true;
   };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    
-    if (!validatePasswords()) {
-      return;
-    }
+ const handleRegister = async (e) => {
+  e.preventDefault();
+   console.log("Register clicked");
 
-    setIsLoading(true);
+  if (!validatePasswords()) return;
 
-    try {
-      await axios.post(
-        "http://localhost:5000/api/auth/register",
-        { email, password }
-      );
+  setIsLoading(true);
 
-      alert("Registered Successfully. Please check your email for verification.");
-      setShowLogin(true);
+  try {
+    await axios.post(
+      "http://localhost:5000/api/auth/register",
+      { email, password, inviteToken },
+        { withCredentials: true }
+    );
 
-    } catch (error) {
-      alert(error.response?.data?.message || "Registration failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    alert("Registered Successfully. Please check your email for verification.");
+    setShowLogin(true);
+
+  } catch (error) {
+    alert(error.response?.data?.message || "Registration failed");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">

@@ -1,6 +1,7 @@
 import { saveMessage } from "../models/messages.model.js";
 
 export const saveMessageService = async (
+  userId,
   phoneNumber,
   messageText,
   status,
@@ -8,6 +9,7 @@ export const saveMessageService = async (
 ) => {
 
   const savedMessage = await saveMessage(
+    userId,
     phoneNumber,
     messageText,
     status,

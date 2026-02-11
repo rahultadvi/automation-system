@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const Login = ({ setIsLoggedIn,setShowLogin }) => {
+const Login = ({ setIsLoggedIn}) => {
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -12,12 +15,14 @@ const Login = ({ setIsLoggedIn,setShowLogin }) => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        { email, password }
-      );
+  "http://localhost:5000/api/auth/login",
+  { email, password },
+  { withCredentials: true }
+);
 
-      localStorage.setItem("token", res.data.token);
+
       setIsLoggedIn(true);
+      navigate("/", { replace: true });
     } catch (error) {
       alert(error.response?.data?.message || "Login failed");
     } finally {
@@ -122,7 +127,7 @@ const Login = ({ setIsLoggedIn,setShowLogin }) => {
               Don't have an account?{" "}
              <button
   type="button"
-  onClick={() => setShowLogin(false)}
+  onClick={() => navigate("/register")}
   className="font-medium text-blue-600 hover:text-blue-500"
 >
   Sign up

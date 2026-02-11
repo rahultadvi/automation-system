@@ -23,16 +23,16 @@ const MessageList = () => {
   const fetchMessages = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      // const token = localStorage.getItem("token");
 
-      const res = await axios.get(
-        "http://localhost:5000/api/messages",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+   const res = await axios.get(
+  // "http://localhost:5000/api/messages",
+   "http://localhost:5000/api/team-messages",
+  {
+    withCredentials: true
+  }
+);
+
 
       setMessages(res.data);
     } catch (error) {
@@ -56,12 +56,14 @@ const MessageList = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this message?")) {
       try {
-        const token = localStorage.getItem("token");
-        await axios.delete(`http://localhost:5000/api/messages/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        // const token = localStorage.getItem("token");
+      await axios.delete(
+  `http://localhost:5000/api/messages/${id}`,
+  {
+    withCredentials: true
+  }
+);
+
         fetchMessages();
       } catch (error) {
         alert("Failed to delete message");
