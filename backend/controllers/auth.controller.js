@@ -346,26 +346,26 @@ export const loginUser = async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ message: "Invalid password" });
 
-    const token = generateToken(user);
+const token = generateToken(user);
 
-   res.cookie("token", token, {
+const isProduction = process.env.NODE_ENV === "production";
+
+res.cookie("token", token, {
   httpOnly: true,
-  sameSite: "lax",
-  secure: false,
-  path: "/",
-   domain: "localhost",
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
   maxAge: 24 * 60 * 60 * 1000
 });
 
+res.json({
+  message: "Login successful",
+  user: {
+    id: user.id,
+    email: user.email,
+    role: user.role
+  }
+});
 
-    res.json({
-      message: "Login successful",
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      }
-    });
 
   } catch (error) {
     res.status(500).json({ error: error.message });
