@@ -44,20 +44,22 @@ export const updateUserPassword = async (email, password, createdBy) => {
 
 
 export const createUser = async (
+  username,
   email,
   password,
   role = "user",
   createdBy = null
 ) => {
   const result = await pool.query(
-    `INSERT INTO users(email,password,role,created_by)
-     VALUES($1,$2,$3,$4)
+    `INSERT INTO users(username,email,password,role,created_by)
+     VALUES($1,$2,$3,$4,$5)
      RETURNING *`,
-    [email, password, role, createdBy]
+    [username, email, password, role, createdBy]
   );
 
   return result.rows[0];
 };
+
 
 
 
