@@ -35,11 +35,9 @@ const createSuperAdmin = async () => {
   if (existing.rows.length === 0) {
 
     const hashed = await bcrypt.hash(password, 10);
-
     const username = email.split("@")[0];
 
-    // ⭐ Super Admin Permissions
-    const permissions = JSON.stringify(["ALL"]);
+    const permissions = ["ALL"];   // ✅ ARRAY
 
     await pool.query(
       `INSERT INTO users(username,email,password,role,is_verified,permissions)
