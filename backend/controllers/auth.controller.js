@@ -186,13 +186,15 @@ export const registerUser = async (req, res) => {
     const role = "admin";
     const createdBy = null;
 const username = email.split("@")[0];
-    const user = await createUser(
-      email,
-      hashedPassword,
-      role,
-      createdBy,
-       username
-    );
+
+const user = await createUser(
+  username,
+  email,
+  hashedPassword,
+  role,
+  createdBy
+);
+
 
     // Email verification
     const token = crypto.randomBytes(32).toString("hex");
