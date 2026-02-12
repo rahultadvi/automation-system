@@ -10,7 +10,7 @@ const SetPassword = () => {
 
   const handleSubmit = async () => {
     try {
-      await axios.post("http://localhost:5000/api/auth/set-password", {
+      await axios.post("https://automation-system-f5p2.onrender.com/api/auth/set-password", {
         email,
         password
       });

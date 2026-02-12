@@ -19,7 +19,7 @@ const InviteUser = ({setShowInvite }) => {
       setLoading(true);
 
       await axios.post(
-        "http://localhost:5000/api/invite/invite",
+        "https://automation-system-f5p2.onrender.com/api/invite/invite",
         { email, password },
         { withCredentials: true }
       );

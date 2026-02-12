@@ -17,7 +17,10 @@ const app = express();
 app.use(cookieParser());
 // app.use(cors());
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: [
+    "http://localhost:5173",
+    "https://automation-system-2.onrender.com"
+  ],
   credentials: true
 }));
 

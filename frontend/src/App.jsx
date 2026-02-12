@@ -67,7 +67,7 @@ useEffect(() => {
 
   const handleLogout = async () => {
     await axios.post(
-      "http://localhost:5000/api/auth/logout",
+      "https://automation-system-f5p2.onrender.com/api/auth/logout",
       {},
       { withCredentials: true }
     );

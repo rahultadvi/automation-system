@@ -11,7 +11,7 @@ const AdminMessageList = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          "http://localhost:5000/api/admin/messages",
+          "https://automation-system-f5p2.onrender.com/api/admin/messages",
           { withCredentials: true }
         );
         setMessages(res.data);

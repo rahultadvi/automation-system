@@ -27,7 +27,7 @@ const MessageList = () => {
 
    const res = await axios.get(
   // "http://localhost:5000/api/messages",
-   "http://localhost:5000/api/team-messages",
+   "https://automation-system-f5p2.onrender.com/api/team-messages",
   {
     withCredentials: true
   }
@@ -58,7 +58,7 @@ const MessageList = () => {
       try {
         // const token = localStorage.getItem("token");
       await axios.delete(
-  `http://localhost:5000/api/messages/${id}`,
+  `https://automation-system-f5p2.onrender.com/api/messages/${id}`,
   {
     withCredentials: true
   }

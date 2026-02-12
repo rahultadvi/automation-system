@@ -19,7 +19,7 @@ const VerifyEmail = () => {
 
       try {
         await axios.get(
-  `http://localhost:5000/api/auth/verify-email?token=${token}`,
+  `https://automation-system-f5p2.onrender.com/api/auth/verify-email?token=${token}`,
   { withCredentials: true }
 );  
 

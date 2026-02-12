@@ -13,7 +13,7 @@ const Users = () => {
       setLoading(true);
 
       const res = await axios.get(
-        "http://localhost:5000/api/auth/users",
+        "https://automation-system-f5p2.onrender.com/api/auth/users",
         { withCredentials: true }
       );
 

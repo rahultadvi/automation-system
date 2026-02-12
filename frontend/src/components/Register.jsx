@@ -43,7 +43,7 @@ useEffect(() => {
 
   try {
     await axios.post(
-      "http://localhost:5000/api/auth/register",
+      "https://automation-system-f5p2.onrender.com/api/auth/register",
       { email, password, inviteToken },
         { withCredentials: true }
     );

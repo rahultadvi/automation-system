@@ -26,7 +26,7 @@ const handleSend = async () => {
     }
 
     const res = await axios.post(
-      "http://localhost:5000/api/send-message",
+      "https://automation-system-f5p2.onrender.com/api/send-message",
       {
         phoneNumber: formattedNumber,
         messageText
