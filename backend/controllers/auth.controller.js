@@ -185,12 +185,13 @@ export const registerUser = async (req, res) => {
     // 🔥 Always admin
     const role = "admin";
     const createdBy = null;
-
+const username = email.split("@")[0];
     const user = await createUser(
       email,
       hashedPassword,
       role,
-      createdBy
+      createdBy,
+       username
     );
 
     // Email verification
