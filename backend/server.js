@@ -25,7 +25,7 @@ app.use(express.json());
 
 const createSuperAdmin = async () => {
   const email = process.env.SUPER_ADMIN_EMAIL;
-const password = process.env.SUPER_ADMIN_PASSWORD;
+  const password = process.env.SUPER_ADMIN_PASSWORD;
 
   const existing = await pool.query(
     "SELECT id FROM users WHERE email=$1",
@@ -36,13 +36,16 @@ const password = process.env.SUPER_ADMIN_PASSWORD;
 
     const hashed = await bcrypt.hash(password, 10);
 
-    // ✅ username email se bana rahe
     const username = email.split("@")[0];
 
+    // ⭐ Super Admin Permissions
+    const permissions = JSON.stringify(["ALL"]);
+
     await pool.query(
-      `INSERT INTO users(username,email,password,role,is_verified)
-       VALUES($1,$2,$3,'super_admin',true)`,
-      [username, email, hashed]
+      `INSERT INTO users(username,email,password,role,is_verified,permissions)
+       VALUES($1,$2,$3,'super_admin',true,$4)`,
+
+      [username, email, hashed, permissions]
     );
 
     console.log("SUPER ADMIN CREATED ✅");
@@ -53,6 +56,7 @@ const password = process.env.SUPER_ADMIN_PASSWORD;
 };
 
 createSuperAdmin();
+
 
 
 
