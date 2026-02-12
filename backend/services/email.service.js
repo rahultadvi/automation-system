@@ -2,19 +2,39 @@ import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
+  },
+  tls: {
+    rejectUnauthorized: false
   }
 });
 
+export const sendVerificationEmail = async (email, link) => {
+  try {
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Verify Email",
+      html: `<a href="${link}">Verify Email</a>`
+    });
+
+    console.log("Mail sent successfully");
+
+  } catch (err) {
+    console.log("MAIL ERROR:", err);
+  }
+};
+
 // export const sendVerificationEmail = async (email, link) => {
 //   await transporter.sendMail({
-//     from: process.env.EMAIL_USER,
-//     to: email,
-//     subject: "Verify Email",
+  //     from: process.env.EMAIL_USER,
+  //     to: email,
+  //     subject: "Verify Email",
 //     html: `
 //       <h2>Verify your email</h2>
 //       <a href="${link}">Click here</a>
@@ -51,23 +71,3 @@ const transporter = nodemailer.createTransport({
 //     `
 //   });
 // };
-
-export const sendVerificationEmail = async (email, link) => {
-  try {
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Verify Email",
-      text: `Verify your email using this link: ${link}`,
-      html: `
-        <h2>Email Verification</h2>
-        <a href="${link}">${link}</a>
-      `
-    });
-
-    console.log("Mail sent:", info.response);
-
-  } catch (err) {
-    console.log("MAIL ERROR:", err);
-  }
-};
