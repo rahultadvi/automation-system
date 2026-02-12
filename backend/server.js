@@ -24,9 +24,8 @@ app.use(cors({
 app.use(express.json());
 
 const createSuperAdmin = async () => {
-
-  const email = "rehultadvi8143+superA@gmail.com";
-  const password = "12345678";
+  const email = process.env.SUPER_ADMIN_EMAIL;
+const password = process.env.SUPER_ADMIN_PASSWORD;
 
   const existing = await pool.query(
     "SELECT id FROM users WHERE email=$1",
@@ -37,10 +36,13 @@ const createSuperAdmin = async () => {
 
     const hashed = await bcrypt.hash(password, 10);
 
+    // ✅ username email se bana rahe
+    const username = email.split("@")[0];
+
     await pool.query(
-      `INSERT INTO users(email,password,role,is_verified)
-       VALUES($1,$2,'super_admin',true)`,
-      [email, hashed]
+      `INSERT INTO users(username,email,password,role,is_verified)
+       VALUES($1,$2,$3,'super_admin',true)`,
+      [username, email, hashed]
     );
 
     console.log("SUPER ADMIN CREATED ✅");
@@ -51,6 +53,7 @@ const createSuperAdmin = async () => {
 };
 
 createSuperAdmin();
+
 
 
 // app.get("/", async (req, res) => {
