@@ -203,7 +203,13 @@ const user = await createUser(
     await saveVerificationToken(user.id, token, expiresAt);
 
     const link = `https://automation-system-2.onrender.com/verify-email?token=${token}`;
-    await sendVerificationEmail(email, link);
+    // await sendVerificationEmail(email, link);
+    try {
+  await sendVerificationEmail(email, link);
+} catch (err) {
+  console.log("Email failed:", err.message);
+}
+
 
     res.json({ message: "User Registered as Admin" });
 

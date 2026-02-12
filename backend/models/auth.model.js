@@ -54,14 +54,23 @@ export const createUser = async (
   const defaultPermissions = [];
 
   const result = await pool.query(
-    `INSERT INTO users(username,email,password,role,created_by,permissions)
-     VALUES($1,$2,$3,$4,$5,$6)
+    `INSERT INTO users
+     (username,email,password,role,created_by,permissions)
+     VALUES ($1,$2,$3,$4,$5,$6)
      RETURNING *`,
-    [username, email, password, role, createdBy, defaultPermissions]
+    [
+      username,
+      email.trim().toLowerCase(),
+      password,
+      role,
+      createdBy,
+      defaultPermissions
+    ]
   );
 
   return result.rows[0];
 };
+
 
 
 
