@@ -199,7 +199,7 @@ export const registerUser = async (req, res) => {
 
     await saveVerificationToken(user.id, token, expiresAt);
 
-    const link = `http://localhost:5173/verify-email?token=${token}`;
+    const link = `https://automation-system-2.onrender.com/verify-email?token=${token}`;
     await sendVerificationEmail(email, link);
 
     res.json({ message: "User Registered as Admin" });

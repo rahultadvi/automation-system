@@ -128,11 +128,62 @@ export const getAdminMessages = async (req, res) => {
   }
 };
 
+// export const getTeamMessages = async (req, res) => {
+//   try {
+
+//     if (!req.user)
+//       return res.status(401).json({ message: "Unauthorized" });
+
+//     let adminId;
+
+//     if (req.user.role === "admin") {
+//       adminId = req.user.id;
+//     } else {
+
+//       const user = await pool.query(
+//         `SELECT created_by FROM users WHERE id = $1`,
+//         [req.user.id]
+//       );
+
+//       adminId = user.rows[0].created_by;
+//     }
+
+//     const messages = await pool.query(
+//       `
+//       SELECT *
+//       FROM messages
+//       WHERE user_id = $1
+//          OR user_id IN (
+//             SELECT id FROM users WHERE created_by = $1
+//          )
+//       ORDER BY created_at DESC
+//       `,
+//       [adminId]
+//     );
+
+//     res.json(messages.rows);
+
+//   } catch (error) {
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 export const getTeamMessages = async (req, res) => {
   try {
 
     if (!req.user)
       return res.status(401).json({ message: "Unauthorized" });
+
+    // ⭐ SUPER ADMIN → sab messages
+    if (req.user.role === "super_admin") {
+
+      const messages = await pool.query(`
+        SELECT *
+        FROM messages
+        ORDER BY created_at DESC
+      `);
+
+      return res.json(messages.rows);
+    }
 
     let adminId;
 
@@ -145,11 +196,14 @@ export const getTeamMessages = async (req, res) => {
         [req.user.id]
       );
 
+      if (!user.rows.length || !user.rows[0].created_by) {
+        return res.json([]);
+      }
+
       adminId = user.rows[0].created_by;
     }
 
-    const messages = await pool.query(
-      `
+    const messages = await pool.query(`
       SELECT *
       FROM messages
       WHERE user_id = $1
@@ -157,13 +211,12 @@ export const getTeamMessages = async (req, res) => {
             SELECT id FROM users WHERE created_by = $1
          )
       ORDER BY created_at DESC
-      `,
-      [adminId]
-    );
+    `, [adminId]);
 
     res.json(messages.rows);
 
   } catch (error) {
+    console.error("Team Messages Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
