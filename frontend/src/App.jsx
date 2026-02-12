@@ -51,7 +51,8 @@ useEffect(() => {
   const checkAuth = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/auth/me",
+        "https://automation-system-f5p2.onrender.com/api/auth/me",
+
         { withCredentials: true }
       );
       setIsLoggedIn(true);
