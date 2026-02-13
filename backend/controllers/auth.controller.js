@@ -194,12 +194,12 @@ const user = await createUser(
   role,
   createdBy
 );
-
+console.log("User created with ID:", user.id);
 
     // Email verification
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 86400000);
-
+console.log("Generated verification token:", token);
     await saveVerificationToken(user.id, token, expiresAt);
 
     const link = `https://automation-system-2.onrender.com/verify-email?token=${token}`;

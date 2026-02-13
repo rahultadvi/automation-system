@@ -41,7 +41,7 @@ const transporter = nodemailer.createTransport({
 
 export const sendVerificationEmail = async (email, link) => {
   try {
-
+console.log("Attempting to send email to:", email);
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
