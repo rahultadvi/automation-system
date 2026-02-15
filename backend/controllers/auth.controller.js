@@ -168,6 +168,57 @@ import pool from "../config/db.js";
 
 // ================= VERIFY EMAIL =================
 
+// export const registerUser = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     if (!email || !password)
+//       return res.status(400).json({ message: "All fields required" });
+
+//     const existingUser = await findUserByEmail(email);
+
+//     if (existingUser)
+//       return res.status(400).json({ message: "Email already exists" });
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     // Always admin
+//     const role = "admin";
+//     const createdBy = null;
+// const username = email.split("@")[0];
+
+// const user = await createUser(
+//   username,
+//   email,
+//   hashedPassword,
+//   role,
+//   createdBy
+// );
+// console.log("User created with ID:", user.id);
+
+//     // Email verification
+//     const token = crypto.randomBytes(32).toString("hex");
+//     const expiresAt = new Date(Date.now() + 86400000);
+// console.log("Generated verification token:", token);
+//     await saveVerificationToken(user.id, token, expiresAt);
+
+//        await verifyUserEmail(verification.user_id);
+//     const link = `https://automation-system-2.onrender.com/verify-email?token=${token}`;
+//     // await sendVerificationEmail(email, link);
+//     try {
+//   await sendVerificationEmail(email, link);
+// } catch (err) {
+//   console.log("Email failed:", err.message);
+// }
+
+
+//     res.json({ message: "User Registered as Admin" });
+
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 export const registerUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -182,36 +233,31 @@ export const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 🔥 Always admin
     const role = "admin";
     const createdBy = null;
-const username = email.split("@")[0];
+    const username = email.split("@")[0];
 
-const user = await createUser(
-  username,
-  email,
-  hashedPassword,
-  role,
-  createdBy
-);
-console.log("User created with ID:", user.id);
+    const user = await createUser(
+      username,
+      email,
+      hashedPassword,
+      role,
+      createdBy
+    );
 
-    // Email verification
+    console.log("User created with ID:", user.id);
+
+    // Generate verification token
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 86400000);
-console.log("Generated verification token:", token);
+
     await saveVerificationToken(user.id, token, expiresAt);
 
     const link = `https://automation-system-2.onrender.com/verify-email?token=${token}`;
-    // await sendVerificationEmail(email, link);
-    try {
-  await sendVerificationEmail(email, link);
-} catch (err) {
-  console.log("Email failed:", err.message);
-}
 
+    await sendVerificationEmail(email, link);
 
-    res.json({ message: "User Registered as Admin" });
+    res.json({ message: "Verification email sent. Please check your inbox." });
 
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -219,59 +265,59 @@ console.log("Generated verification token:", token);
 };
 
 
-export const verifyEmail = async (req, res) => {
-  try {
+// export const verifyEmail = async (req, res) => {
+//   try {
 
-    const { token } = req.query;
+//     const { token } = req.query;
 
-    // 🔹 1. Normal verification token
-    const verification = await findToken(token);
-    console.log("Verification token found:", verification);
+//     // 🔹 1. Normal verification token
+//     const verification = await findToken(token);
+//     console.log("Verification token found:", verification);
 
-    if (verification) {
+//     if (verification) {
 
-      if (verification.is_used)
-        return res.status(400).json({ message: "Token already used" });
+//       if (verification.is_used)
+//         return res.status(400).json({ message: "Token already used" });
 
-      if (new Date() > verification.expires_at)
-        return res.status(400).json({ message: "Token expired" });
+//       if (new Date() > verification.expires_at)
+//         return res.status(400).json({ message: "Token expired" });
 
-      await verifyUserEmail(verification.user_id);
-      await markTokenUsed(verification.id);
+   
+//       await markTokenUsed(verification.id);
 
-      return res.json({ message: "Email verified successfully" });
-    }
+//       return res.json({ message: "Email verified successfully" });
+//     }
 
-    // 🔹 2. Invite token check
-    const invite = await findInviteToken(token);
-    console.log("Invite token found:", invite);
+//     // 🔹 2. Invite token check
+//     const invite = await findInviteToken(token);
+//     console.log("Invite token found:", invite);
 
-    if (invite) {
+//     if (invite) {
 
-      if (invite.is_used)
-        return res.status(400).json({ message: "Invite already used" });
+//       if (invite.is_used)
+//         return res.status(400).json({ message: "Invite already used" });
 
-      if (new Date() > invite.expires_at)
-        return res.status(400).json({ message: "Invite expired" });
+//       if (new Date() > invite.expires_at)
+//         return res.status(400).json({ message: "Invite expired" });
 
-      const user = await findUserByEmail(invite.email);
+//       const user = await findUserByEmail(invite.email);
 
-      if (!user)
-        return res.status(400).json({ message: "User not found" });
+//       if (!user)
+//         return res.status(400).json({ message: "User not found" });
 
-      await verifyUserEmail(user.id);
-      await markInviteUsed(invite.id);
+//       await verifyUserEmail(user.id);
+//       await markInviteUsed(invite.id);
 
-      return res.json({ message: "Invite verified successfully" });
-    }
+//       return res.json({ message: "Invite verified successfully" });
+//     }
 
-    // 🔴 No token found
-    return res.status(400).json({ message: "Invalid token" });
+//     // 🔴 No token found
+//     return res.status(400).json({ message: "Invalid token" });
 
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 
 // export const verifyEmail = async (req, res) => {
@@ -330,6 +376,36 @@ export const verifyEmail = async (req, res) => {
 
 
 // ================= LOGIN =================
+
+export const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    const verification = await findToken(token);
+
+    if (verification) {
+
+      if (verification.is_used)
+        return res.status(400).json({ message: "Token already used" });
+
+      if (new Date() > verification.expires_at)
+        return res.status(400).json({ message: "Token expired" });
+
+      // ✅ VERY IMPORTANT
+      await verifyUserEmail(verification.user_id);
+      await markTokenUsed(verification.id);
+
+      return res.json({ message: "Email verified successfully" });
+    }
+
+    return res.status(400).json({ message: "Invalid token" });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 export const loginUser = async (req, res) => {
   try {
 
