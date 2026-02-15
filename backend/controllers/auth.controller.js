@@ -226,6 +226,7 @@ export const verifyEmail = async (req, res) => {
 
     // 🔹 1. Normal verification token
     const verification = await findToken(token);
+    console.log("Verification token found:", verification);
 
     if (verification) {
 
@@ -243,6 +244,7 @@ export const verifyEmail = async (req, res) => {
 
     // 🔹 2. Invite token check
     const invite = await findInviteToken(token);
+    console.log("Invite token found:", invite);
 
     if (invite) {
 
