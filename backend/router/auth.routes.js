@@ -13,22 +13,5 @@ router.post("/logout", logoutUser);
 router.get("/users", authMiddleware, getAllUsers);
 router.post("/set-password", setPassword);
 
-app.get("/test-email", async (req, res) => {
-  try {
-    const response = await resend.emails.send({
-      from: "onboarding@resend.dev",
-      to: "rahultadvi8143@gmail.com",
-      subject: "DIRECT TEST",
-      html: "<h1>Working?</h1>"
-    });
-
-    console.log("Response:", response);
-    res.json(response);
-
-  } catch (error) {
-    console.log("Error full:", error);
-    res.json(error);
-  }
-});
 
 export default router;
