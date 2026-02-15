@@ -1,8 +1,8 @@
+import dotenv from "dotenv";
 import express from "express";
 import cors from "cors"
 import cookieParser from "cookie-parser";
 import bcrypt from "bcrypt";
-import dotenv from "dotenv";
 import creadansial from "./router/credentials.routes.js"
 import messageCreadansial from "./router/message.routes.js"
 import webhookRoutes from "./router/webhook.routes.js";
@@ -11,7 +11,7 @@ import inviteRoutes from "./router/invite.routes.js";
 
 
 import pool from "./config/db.js";
-
+const PORT = process.env.PORT || 5000;
 dotenv.config();
 const app = express();
 app.use(cookieParser());
@@ -73,6 +73,6 @@ app.use("/api/auth",authRoutes);
 app.use("/api/invite",inviteRoutes)
 
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
