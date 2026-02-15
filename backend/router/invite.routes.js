@@ -5,8 +5,6 @@ import { inviteUser, verifyInviteEmail } from "../controllers/inviteUser.control
 
 const router = express.Router();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 router.post("/invite", authMiddleware, inviteUser);
 router.get("/verify-email", verifyInviteEmail);
 
