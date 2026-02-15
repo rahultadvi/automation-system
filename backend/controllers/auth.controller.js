@@ -219,57 +219,57 @@ console.log("Generated verification token:", token);
 };
 
 
-export const verifyEmail = async (req, res) => {
-  try {
+// export const verifyEmail = async (req, res) => {
+//   try {
 
-    const { token } = req.query;
+//     const { token } = req.query;
 
-    // 🔹 1. Normal verification token
-    const verification = await findToken(token);
+//     // 🔹 1. Normal verification token
+//     const verification = await findToken(token);
 
-    if (verification) {
+//     if (verification) {
 
-      if (verification.is_used)
-        return res.status(400).json({ message: "Token already used" });
+//       if (verification.is_used)
+//         return res.status(400).json({ message: "Token already used" });
 
-      if (new Date() > verification.expires_at)
-        return res.status(400).json({ message: "Token expired" });
+//       if (new Date() > verification.expires_at)
+//         return res.status(400).json({ message: "Token expired" });
 
-      await verifyUserEmail(verification.user_id);
-      await markTokenUsed(verification.id);
+//       await verifyUserEmail(verification.user_id);
+//       await markTokenUsed(verification.id);
 
-      return res.json({ message: "Email verified successfully" });
-    }
+//       return res.json({ message: "Email verified successfully" });
+//     }
 
-    // 🔹 2. Invite token check
-    const invite = await findInviteToken(token);
+//     // 🔹 2. Invite token check
+//     const invite = await findInviteToken(token);
 
-    if (invite) {
+//     if (invite) {
 
-      if (invite.is_used)
-        return res.status(400).json({ message: "Invite already used" });
+//       if (invite.is_used)
+//         return res.status(400).json({ message: "Invite already used" });
 
-      if (new Date() > invite.expires_at)
-        return res.status(400).json({ message: "Invite expired" });
+//       if (new Date() > invite.expires_at)
+//         return res.status(400).json({ message: "Invite expired" });
 
-      const user = await findUserByEmail(invite.email);
+//       const user = await findUserByEmail(invite.email);
 
-      if (!user)
-        return res.status(400).json({ message: "User not found" });
+//       if (!user)
+//         return res.status(400).json({ message: "User not found" });
 
-      await verifyUserEmail(user.id);
-      await markInviteUsed(invite.id);
+//       await verifyUserEmail(user.id);
+//       await markInviteUsed(invite.id);
 
-      return res.json({ message: "Invite verified successfully" });
-    }
+//       return res.json({ message: "Invite verified successfully" });
+//     }
 
-    // 🔴 No token found
-    return res.status(400).json({ message: "Invalid token" });
+//     // 🔴 No token found
+//     return res.status(400).json({ message: "Invalid token" });
 
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 
 // export const verifyEmail = async (req, res) => {
