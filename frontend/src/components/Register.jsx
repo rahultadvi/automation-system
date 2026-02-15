@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+  import { useNavigate } from "react-router-dom";
 
-const Register = ({ setShowLogin }) => {
+
+const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState("");
-  
 
 const [inviteToken, setInviteToken] = useState("");
+
+const navigate = useNavigate();
 useEffect(() => {
   const params = new URLSearchParams(window.location.search);
   const token = params.get("invite");
@@ -36,6 +39,7 @@ useEffect(() => {
  const handleRegister = async (e) => {
   e.preventDefault();
    console.log("Register clicked");
+     if (isLoading) return; 
 
   if (!validatePasswords()) return;
 
@@ -49,8 +53,8 @@ useEffect(() => {
     );
 
     alert("Registered Successfully. Please check your email for verification.");
-    setShowLogin(true);
-
+    // setShowLogin(true);
+        navigate("/login");  
   } catch (error) {
     alert(error.response?.data?.message || "Registration failed");
   } finally {
@@ -184,7 +188,9 @@ useEffect(() => {
               Already have an account?{" "}
               <button
                 type="button"
-                onClick={() => setShowLogin(true)}
+                // onClick={() => setShowLogin(true)}
+                onClick={() => navigate("/login")}
+
                 className="font-medium text-blue-600 hover:text-blue-500 focus:outline-none focus:underline transition-all duration-200"
               >
                 Sign in
