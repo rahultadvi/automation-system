@@ -51,7 +51,7 @@ if (!user) {
 
     await saveInviteToken(email, token, req.user.id, expiresAt,  "user"  );
 
-    const link = `https://automation-system-2.onrender.com/verify-email?token=${token}`;
+    const link = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
     await sendVerificationEmail(email, link);
 
     res.json({ message: "Invite sent successfully" });

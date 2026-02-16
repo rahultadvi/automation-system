@@ -1,26 +1,19 @@
 import SibApiV3Sdk from "sib-api-v3-sdk";
 
-// Setup API client properly
 const client = SibApiV3Sdk.ApiClient.instance;
-const apiKey = client.authentications["api-key"];
-apiKey.apiKey = process.env.BREVO_API_KEY;
+client.authentications["api-key"].apiKey =
+  process.env.BREVO_API_KEY;
 
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 export const sendVerificationEmail = async (email, link) => {
   try {
-
-    if (!process.env.BREVO_API_KEY) {
-      console.error("BREVO_API_KEY missing!");
-      return;
-    }
-
-    const response = await apiInstance.sendTransacEmail({
+    await apiInstance.sendTransacEmail({
       sender: {
         name: "Automation System",
-        email: "rahultadvi8143@gmail.com", // must be verified
+        email: "rahultadvi8143@gmail.com", // verified sender
       },
-      to: [{ email: email }],
+      to: [{ email }],
       subject: "Verify Email",
       htmlContent: `
         <h2>Email Verification</h2>
@@ -29,11 +22,13 @@ export const sendVerificationEmail = async (email, link) => {
       `,
     });
 
-    console.log("Email sent successfully:", response.messageId);
+    console.log("Email sent successfully");
 
   } catch (err) {
-    console.error("=== BREVO FULL ERROR ===");
-    console.error(err.response?.body || err.message || err);
+    console.error(
+      "BREVO ERROR:",
+      err.response?.body || err.message
+    );
   }
 };
 

@@ -25,7 +25,8 @@ app.use(cookieParser());
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://automation-system-2.onrender.com"
+    // "https://automation-system-2.onrender.com"
+    "https://automation-system-f5p2.onrender.com"
   ],
   credentials: true
 }));
