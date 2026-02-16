@@ -2,12 +2,13 @@ import SibApiV3Sdk from "sib-api-v3-sdk";
 
 const client = SibApiV3Sdk.ApiClient.instance;
 client.authentications["api-key"].apiKey =
-  process.env.BREVO_API_KEY;
+  process.env.BREVO_SMTP_KEY;
 
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 export const sendVerificationEmail = async (email, link) => {
   try {
+    console.log("BREVO_SMTP_KEY:", process.env.BREVO_SMTP_KEY);
     await apiInstance.sendTransacEmail({
       sender: {
         name: "Automation System",
