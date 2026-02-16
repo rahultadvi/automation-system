@@ -141,3 +141,33 @@ export const markInviteUsed = async (id) => {
   );
 };
 
+export const saveMessage = async (
+  userId,
+  phoneNumber,
+  messageText,
+  status,
+  responseId
+) => {
+  try {
+
+    const result = await pool.query(
+      `INSERT INTO messages
+       (user_id, phone_number, message_text, status, response_id)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [
+        userId,
+        phoneNumber,
+        messageText,
+        status,
+        responseId
+      ]
+    );
+
+    return result.rows[0];
+
+  } catch (error) {
+    console.error("Save Message Model Error:", error.message);
+    throw error;
+  }
+};
