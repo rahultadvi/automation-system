@@ -1,35 +1,30 @@
 import SibApiV3Sdk from "sib-api-v3-sdk";
 
 const client = SibApiV3Sdk.ApiClient.instance;
+
 client.authentications["api-key"].apiKey =
-  process.env.BREVO_SMTP_KEY;
+  process.env.BREVO_API_KEY;
 
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 export const sendVerificationEmail = async (email, link) => {
   try {
-    console.log("BREVO_SMTP_KEY:", process.env.BREVO_SMTP_KEY);
     await apiInstance.sendTransacEmail({
       sender: {
         name: "Automation System",
-        email: "rahultadvi8143@gmail.com", // verified sender
+        email: "rahultadvi8143@gmail.com",
       },
       to: [{ email }],
       subject: "Verify Email",
       htmlContent: `
         <h2>Email Verification</h2>
-        <p>Click below to verify:</p>
         <a href="${link}">Verify Email</a>
       `,
     });
 
     console.log("Email sent successfully");
-
   } catch (err) {
-    console.error(
-      "BREVO ERROR:",
-      err.response?.body || err.message
-    );
+    console.error("BREVO ERROR:", err.response?.body || err.message);
   }
 };
 
