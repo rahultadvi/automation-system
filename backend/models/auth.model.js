@@ -16,32 +16,13 @@ export const findUserByEmail = async (email) => {
   return result.rows[0];
 };
 
-// export const createInvitedUser = async (email, password, createdBy) => {
-//   const result = await pool.query(
-//     `INSERT INTO users (email, password, is_verified, created_by, role)
-//      VALUES ($1, $2, true, $3, 'user')
-//      RETURNING *`,
-//     [email.trim(), password, createdBy]
-//   );
-//   return result.rows[0];
-// };
 export const createInvitedUser = async (email, password, createdBy) => {
-
-  const username = email.split("@")[0]; // ✅ auto username
-
   const result = await pool.query(
-    `INSERT INTO users 
-     (username, email, password, is_verified, created_by, role)
-     VALUES ($1, $2, $3, true, $4, 'user')
+    `INSERT INTO users (email, password, is_verified, created_by, role)
+     VALUES ($1, $2, true, $3, 'user')
      RETURNING *`,
-    [
-      username,
-      email.trim().toLowerCase(),
-      password,
-      createdBy
-    ]
+    [email.trim(), password, createdBy]
   );
-
   return result.rows[0];
 };
 

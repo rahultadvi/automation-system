@@ -4,29 +4,71 @@ import { saveMessageService } from "../services/message.service.js";
 
 
 // ⭐ Send Message
-export const sendMessageController = async (req, res) => {
-console.log("Decoded User:", req.user);
+// export const sendMessageController = async (req, res) => {
+// console.log("Decoded User:", req.user);
 
+//   try {
+
+//     const { phoneNumber, messageText } = req.body;
+//        const { id: userId } = req.user;
+
+//     if (!phoneNumber || !messageText) {
+//       return res.status(400).json({
+//         message: "Phone number and message text are required"
+//       });
+//     }
+    
+
+//     const whatsappResponse = await sendWhatsAppMessage(phoneNumber, messageText);
+
+//     const savedMessage = await saveMessageService(
+//        userId,
+//       phoneNumber,
+//       messageText,
+//       "sent",
+//       whatsappResponse.messages[0].id
+//     );
+
+//     res.status(200).json({
+//       message: "Message sent successfully",
+//       data: savedMessage
+//     });
+
+//   } catch (error) {
+
+//     console.error("Send Message Error:", error.message);
+
+//     res.status(500).json({
+//       message: "Failed to send message",
+//       error: error.message
+//     });
+
+//   }
+
+// };
+export const sendMessageController = async (req, res) => {
   try {
 
     const { phoneNumber, messageText } = req.body;
-       const { id: userId } = req.user;
+    const { id: userId } = req.user;
 
     if (!phoneNumber || !messageText) {
       return res.status(400).json({
         message: "Phone number and message text are required"
       });
     }
-    
 
     const whatsappResponse = await sendWhatsAppMessage(phoneNumber, messageText);
 
+    const whatsappMessageId =
+      whatsappResponse?.messages?.[0]?.id || null;
+
     const savedMessage = await saveMessageService(
-       userId,
+      userId,
       phoneNumber,
       messageText,
       "sent",
-      whatsappResponse.messages[0].id
+      whatsappMessageId
     );
 
     res.status(200).json({
@@ -36,15 +78,13 @@ console.log("Decoded User:", req.user);
 
   } catch (error) {
 
-    console.error("Send Message Error:", error.message);
+    console.error("Send Message Error:", error);
 
     res.status(500).json({
       message: "Failed to send message",
       error: error.message
     });
-
   }
-
 };
 
 
