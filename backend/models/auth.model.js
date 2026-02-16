@@ -28,18 +28,21 @@ export const findUserByEmail = async (email) => {
 
 export const createInvitedUser = async (email, password, createdBy) => {
 
-  const username = email.split("@")[0];   // 🔥 username generate
+  const username = email.split("@")[0];
+
+  const defaultPermissions = ["read"];  // ✅ important
 
   const result = await pool.query(
     `INSERT INTO users 
-     (username, email, password, is_verified, created_by, role)
-     VALUES ($1, $2, $3, true, $4, 'user')
+     (username, email, password, is_verified, created_by, role, permissions)
+     VALUES ($1, $2, $3, true, $4, 'user', $5)
      RETURNING *`,
     [
       username,
       email.trim().toLowerCase(),
       password,
-      createdBy
+      createdBy,
+      defaultPermissions
     ]
   );
 

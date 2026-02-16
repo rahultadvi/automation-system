@@ -14,6 +14,7 @@ import {
 
 export const inviteUser = async (req, res) => {
   try {
+    console.log("Invite request received from user:", req.user.email);
     const { email, password } = req.body;
 
         if (req.user.role !== "admin") {
