@@ -1,4 +1,5 @@
-import pool from "../config/db.js";
+// import pool from "../config/db.js";
+import { saveMessage } from "../models/messages.model.js";
 
 export const saveMessage = async (
   userId,
