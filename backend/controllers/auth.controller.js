@@ -383,6 +383,8 @@ export const verifyEmail = async (req, res) => {
 
     const verification = await findToken(token);
 
+    console.log("Verification token found:", verification);
+
     if (verification) {
 
       if (verification.is_used)
@@ -452,8 +454,6 @@ res.json({
     role: user.role
   }
 });
-
-
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -473,12 +473,10 @@ export const getCurrentUser = async (req, res) => {
         role: req.user.role
       }
     });
-
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
  export const logoutUser = async (req, res) => {
 
   res.clearCookie("token");
@@ -486,7 +484,6 @@ export const getCurrentUser = async (req, res) => {
   res.json({ message: "Logged out successfully" });
 
 };
-
 
 export const getAllUsers = async (req, res) => {
 
@@ -527,9 +524,7 @@ const result = await pool.query(
       message: "Server error"
     });
   }
-
 };
-
 
 export const setPassword = async (req, res) => {
   try {
