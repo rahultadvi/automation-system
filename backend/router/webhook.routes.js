@@ -10,7 +10,7 @@ const router = express.Router();
 // ==================
 router.get("/webhook", (req, res) => {
 
-  const VERIFY_TOKEN = "rahul123";
+  const VERIFY_TOKEN = "mytoken123";
 
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
