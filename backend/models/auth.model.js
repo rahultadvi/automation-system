@@ -16,16 +16,35 @@ export const findUserByEmail = async (email) => {
   return result.rows[0];
 };
 
+// export const createInvitedUser = async (email, password, createdBy) => {
+//   const result = await pool.query(
+//     `INSERT INTO users (email, password, is_verified, created_by, role)
+//      VALUES ($1, $2, true, $3, 'user')
+//      RETURNING *`,
+//     [email.trim(), password, createdBy]
+//   );
+//   return result.rows[0];
+// };
+
 export const createInvitedUser = async (email, password, createdBy) => {
+
+  const username = email.split("@")[0];   // 🔥 username generate
+
   const result = await pool.query(
-    `INSERT INTO users (email, password, is_verified, created_by, role)
-     VALUES ($1, $2, true, $3, 'user')
+    `INSERT INTO users 
+     (username, email, password, is_verified, created_by, role)
+     VALUES ($1, $2, $3, true, $4, 'user')
      RETURNING *`,
-    [email.trim(), password, createdBy]
+    [
+      username,
+      email.trim().toLowerCase(),
+      password,
+      createdBy
+    ]
   );
+
   return result.rows[0];
 };
-
 
 
 export const updateUserPassword = async (email, password, createdBy) => {
