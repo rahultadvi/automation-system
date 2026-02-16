@@ -1,5 +1,8 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import express from "express";
+
 import cors from "cors"
 import cookieParser from "cookie-parser";
 import bcrypt from "bcrypt";
@@ -12,6 +15,9 @@ import inviteRoutes from "./router/invite.routes.js";
 
 import pool from "./config/db.js";
 const PORT = process.env.PORT || 5000;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 dotenv.config();
 const app = express();
 app.use(cookieParser());
@@ -70,7 +76,14 @@ app.use("/api",creadansial);
 app.use("/api",messageCreadansial); 
 app.use("/web",webhookRoutes);
 app.use("/api/auth",authRoutes);
-app.use("/api/invite",inviteRoutes)
+app.use("/api/invite",inviteRoutes);
+
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
+
 
 
 app.listen(PORT, () => {
