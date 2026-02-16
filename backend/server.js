@@ -79,12 +79,15 @@ app.use("/api/auth",authRoutes);
 app.use("/api/invite",inviteRoutes);
 
 
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
+// Serve React build
+app.use(express.static(path.resolve(__dirname, "../frontend/dist")));
 
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+// React Router fallback (VERY IMPORTANT)
+app.get("*", (req, res) => {
+  res.sendFile(
+    path.resolve(__dirname, "../frontend/dist", "index.html")
+  );
 });
-
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
