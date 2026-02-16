@@ -256,6 +256,7 @@ export const registerUser = async (req, res) => {
     const link = `https://automation-system-2.onrender.com/verify-email?token=${token}`;
 
     await sendVerificationEmail(email, link);
+    console.log("Verification email sent to:", email);
 
     res.json({ message: "Verification email sent. Please check your inbox." });
 
