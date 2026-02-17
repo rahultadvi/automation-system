@@ -117,21 +117,22 @@ router.post("/webhook", async (req, res) => {
     // ===============================
     if (value?.statuses) {
 
-      const statusData = value.statuses[0];
+  const statusData = value.statuses[0];
 
-      const messageId = statusData.id;
-      const status = statusData.status; // sent, delivered, read
+  const messageId = statusData.id;
+  const status = statusData.status;
+  const error = statusData.errors?.[0]?.title || null;
 
-      console.log("Status Update:", messageId, status);
+  console.log("Status Update:", messageId, status, error);
 
-      await pool.query(
-        `UPDATE messages
-         SET message_status = $1
-         WHERE response_id = $2`,
-        [status, messageId]
-      );
-    }
-
+  await pool.query(
+    `UPDATE messages
+     SET message_status = $1,
+         error_message = $2
+     WHERE response_id = $3`,
+    [status, error, messageId]
+  );
+}
     res.sendStatus(200);
 
   } catch (error) {
