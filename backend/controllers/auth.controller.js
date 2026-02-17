@@ -17,207 +17,7 @@ import { generateToken } from "../utils/jwt.js";
 import pool from "../config/db.js";
 
 
-// ================= REGISTER =================
-// export const registerUser = async (req, res) => {
-//   try {
 
-//     const { email, password, inviteToken } = req.body;
-
-//     if (!email || !password)
-//       return res.status(400).json({ message: "All fields required" });
-
-
-//     const existingUser = await findUserByEmail(email);
-
-//     if (existingUser)
-//       return res.status(400).json({ message: "Email already exists" });
-
-
-//     // ⭐ Invite OPTIONAL
-//     let invite = null;
-
-//     if (inviteToken) {
-
-//       invite = await findInviteToken(inviteToken);
-
-//       if (!invite)
-//         return res.status(400).json({ message: "Invalid invite" });
-
-//       if (invite.is_used)
-//         return res.status(400).json({ message: "Invite already used" });
-
-//       if (new Date() > invite.expires_at)
-//         return res.status(400).json({ message: "Invite expired" });
-
-//       if (invite.email !== email)
-//         return res.status(400).json({ message: "Invite email mismatch" });
-//     }
-
-
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     const user = await createUser(email, hashedPassword,"admin");
-
-
-//     // ⭐ Invite used mark
-//     if (invite) {
-//       await markInviteUsed(invite.id);
-//     }
-
-
-//     // ⭐ Email verification
-//     const token = crypto.randomBytes(32).toString("hex");
-//     const expiresAt = new Date(Date.now() + 86400000);
-
-//     await saveVerificationToken(user.id, token, expiresAt);
-
-//     const link = `http://localhost:5000/api/auth/verify-email?token=${token}`;
-
-//     await sendVerificationEmail(email, link);
-
-//     res.json({ message: "User Registered" });
-
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
-// export const registerUser = async (req, res) => {
-//   try {
-
-//     const { email, password, inviteToken } = req.body;
-
-//     if (!email || !password)
-//       return res.status(400).json({ message: "All fields required" });
-
-//     const existingUser = await findUserByEmail(email);
-
-//     if (existingUser)
-//       return res.status(400).json({ message: "Email already exists" });
-
-//     let invite = null;
-
-//     if (inviteToken) {
-
-//       invite = await findInviteToken(inviteToken);
-
-//       if (!invite)
-//         return res.status(400).json({ message: "Invalid invite" });
-
-//       if (invite.is_used)
-//         return res.status(400).json({ message: "Invite already used" });
-
-//       if (new Date() > invite.expires_at)
-//         return res.status(400).json({ message: "Invite expired" });
-
-//       if (invite.email !== email)
-//         return res.status(400).json({ message: "Invite email mismatch" });
-//     }
-
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     // ⭐ Admin exist check
-//     const adminCheck = await pool.query(
-//       "SELECT id FROM users WHERE role='admin' LIMIT 1"
-//     );
-
-//     let role = "user";
-// let createdBy = null;
-
-// if (invite) {
-
-//   role = invite.role;
-//   createdBy = invite.invited_by;
-
-// } else {
-
-//   const adminCheck = await pool.query(
-//     "SELECT id FROM users WHERE role='admin' LIMIT 1"
-//   );
-
-//   if (adminCheck.rows.length === 0) {
-//     role = "admin";
-//   }
-// }
-
-
-//     const user = await createUser(
-//       email,
-//       hashedPassword,
-//       role,
-//       createdBy
-//     );
-
-//     // ⭐ Email verification
-//     const token = crypto.randomBytes(32).toString("hex");
-//     const expiresAt = new Date(Date.now() + 86400000);
-
-//     await saveVerificationToken(user.id, token, expiresAt);
-
-//     const link = `http://localhost:5173/verify-email?token=${token}`;
-
-//     await sendVerificationEmail(email, link);
-
-//     res.json({ message: "User Registered" });
-
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
-
-// ================= VERIFY EMAIL =================
-
-// export const registerUser = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-
-//     if (!email || !password)
-//       return res.status(400).json({ message: "All fields required" });
-
-//     const existingUser = await findUserByEmail(email);
-
-//     if (existingUser)
-//       return res.status(400).json({ message: "Email already exists" });
-
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     // Always admin
-//     const role = "admin";
-//     const createdBy = null;
-// const username = email.split("@")[0];
-
-// const user = await createUser(
-//   username,
-//   email,
-//   hashedPassword,
-//   role,
-//   createdBy
-// );
-// console.log("User created with ID:", user.id);
-
-//     // Email verification
-//     const token = crypto.randomBytes(32).toString("hex");
-//     const expiresAt = new Date(Date.now() + 86400000);
-// console.log("Generated verification token:", token);
-//     await saveVerificationToken(user.id, token, expiresAt);
-
-//        await verifyUserEmail(verification.user_id);
-//     const link = `https://automation-system-2.onrender.com/verify-email?token=${token}`;
-//     // await sendVerificationEmail(email, link);
-//     try {
-//   await sendVerificationEmail(email, link);
-// } catch (err) {
-//   console.log("Email failed:", err.message);
-// }
-
-
-//     res.json({ message: "User Registered as Admin" });
-
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
 
 // export const registerUser = async (req, res) => {
 //   try {
@@ -295,6 +95,67 @@ import pool from "../config/db.js";
 //     res.status(500).json({ error: error.message });
 //   }
 // };
+
+export const registerUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password)
+      return res.status(400).json({ message: "All fields required" });
+
+    const existingUser = await findUserByEmail(email);
+
+    if (existingUser)
+      return res.status(400).json({ message: "Email already exists" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const role = "admin";
+    const createdBy = null;
+    const username = email.split("@")[0];
+
+    const user = await createUser(
+      username,
+      email,
+      hashedPassword,
+      role,
+      createdBy
+    );
+
+    console.log("User created with ID:", user.id);
+
+    // 🔥 YAHI IMPORTANT ADD KARNA HAI
+    await pool.query(
+      `INSERT INTO whatsapp_credentials 
+       (user_id, whatsapp_token, phone_number_id) 
+       VALUES ($1, $2, $3)`,
+      [
+        user.id,
+        process.env.whatsapp_token,
+        process.env.phone_number_id
+      ]
+    );
+
+    console.log("WhatsApp credentials auto-created");
+
+    // Email verification token
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 86400000);
+
+    await saveVerificationToken(user.id, token, expiresAt);
+
+    const link = `https://automation-system-f5p2.onrender.com/verify-email?token=${token}`;
+
+    await sendVerificationEmail(email, link);
+
+    res.json({ message: "Verification email sent. Please check your inbox." });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
@@ -345,67 +206,6 @@ export const verifyEmail = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-export const registerUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password)
-      return res.status(400).json({ message: "All fields required" });
-
-    const existingUser = await findUserByEmail(email);
-
-    if (existingUser)
-      return res.status(400).json({ message: "Email already exists" });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const role = "admin";
-    const createdBy = null;
-    const username = email.split("@")[0];
-
-    const user = await createUser(
-      username,
-      email,
-      hashedPassword,
-      role,
-      createdBy
-    );
-
-    console.log("User created with ID:", user.id);
-
-    // 🔥 YAHI IMPORTANT ADD KARNA HAI
-await pool.query(
-  `INSERT INTO whatsapp_credentials 
-   (user_id, whatsapp_token, phone_number_id) 
-   VALUES ($1, $2, $3)
-   ON CONFLICT (user_id) DO NOTHING`,
-  [
-    user.id,
-    process.env.DEFAULT_WHATSAPP_TOKEN,
-    process.env.DEFAULT_PHONE_NUMBER_ID
-  ]
-);
-
-console.log("WhatsApp credentials ensured for:", user.id);
-
-    // Email verification token
-    const token = crypto.randomBytes(32).toString("hex");
-    const expiresAt = new Date(Date.now() + 86400000);
-
-    await saveVerificationToken(user.id, token, expiresAt);
-
-    const link = `https://automation-system-f5p2.onrender.com/verify-email?token=${token}`;
-
-    await sendVerificationEmail(email, link);
-
-    res.json({ message: "Verification email sent. Please check your inbox." });
-
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 
 
 export const loginUser = async (req, res) => {
