@@ -53,12 +53,20 @@ router.post("/webhook", async (req, res) => {
       //   VALUES ($1,$2,$3,$4)`,
       //   [phoneNumber, messageText, "received", messageId]
       // );
+// await pool.query(
+//   `INSERT INTO messages 
+//    (phone_number, content, message_status, response_id) 
+//    VALUES ($1,$2,$3,$4)`,
+//   [phoneNumber, messageText, "received", messageId]
+// );
+
 await pool.query(
   `INSERT INTO messages 
-   (phone_number, content, message_status, response_id) 
+   (phone_number, message_text, message_status, response_id) 
    VALUES ($1,$2,$3,$4)`,
   [phoneNumber, messageText, "received", messageId]
 );
+
 
 
       // ✅ AUTO REPLY (IMPORTANT)
