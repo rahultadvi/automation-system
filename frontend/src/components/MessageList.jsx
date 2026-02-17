@@ -116,7 +116,7 @@ const MessageList = () => {
   // });
 
 
-  const filteredMessages = messages.filter(msg => {
+const filteredMessages = messages.filter(msg => {
   const matchesSearch =
     msg.phone_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     msg.message_text?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -127,6 +127,7 @@ const MessageList = () => {
 
   return matchesSearch && matchesFilter;
 });
+
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-6">
