@@ -103,17 +103,30 @@ const MessageList = () => {
     }
   };
 
+  // const filteredMessages = messages.filter(msg => {
+  //   const matchesSearch = 
+  //     msg.phone_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     msg.message_text?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+  //   const matchesFilter = 
+  //     statusFilter === "all" || 
+  //     msg.message_status?.toLowerCase() === statusFilter.toLowerCase();
+    
+  //   return matchesSearch && matchesFilter;
+  // });
+
+
   const filteredMessages = messages.filter(msg => {
-    const matchesSearch = 
-      msg.phone_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      msg.content?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesFilter = 
-      statusFilter === "all" || 
-      msg.status?.toLowerCase() === statusFilter.toLowerCase();
-    
-    return matchesSearch && matchesFilter;
-  });
+  const matchesSearch =
+    msg.phone_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    msg.message_text?.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const matchesFilter =
+    statusFilter === "all" ||
+    msg.message_status?.toLowerCase() === statusFilter.toLowerCase();
+
+  return matchesSearch && matchesFilter;
+});
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-6">
@@ -286,7 +299,7 @@ const MessageList = () => {
                         <div>
                           <span className="font-medium text-gray-700">Message:</span>
                           <p className="mt-1 text-gray-800 whitespace-pre-wrap">
-                            {msg.content}
+                            {msg.message_text}
                           </p>
                         </div>
                       </div>
@@ -296,9 +309,9 @@ const MessageList = () => {
                   <div className="flex items-start space-x-4 mt-4 md:mt-0">
                     <div className="flex flex-col items-end">
                       <div className="flex items-center">
-                        {getStatusIcon(msg.status)}
-                        <span className={`ml-2 px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(msg.status)}`}>
-                          {msg.status || "Unknown"}
+                        {getStatusIcon(msg.message_status)}
+                        <span className={`ml-2 px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(msg.message_status)}`}>
+                          {msg.message_status || "Unknown"}
                         </span>
                       </div>
                       
