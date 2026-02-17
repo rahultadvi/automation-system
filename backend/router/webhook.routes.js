@@ -94,56 +94,26 @@ router.post("/webhook", async (req, res) => {
     // ===============================
     // 1️⃣ Incoming Message
     // ===============================
-    // if (value?.messages) {
+    if (value?.messages) {
 
-    //   const messageData = value.messages[0];
+      const messageData = value.messages[0];
 
-    //   const phoneNumber = messageData.from;
-    //   const messageText = messageData.text?.body || null;
-    //   const messageId = messageData.id;
+      const phoneNumber = messageData.from;
+      const messageText = messageData.text?.body || null;
+      const messageId = messageData.id;
 
-    //   console.log("Incoming Message:", phoneNumber, messageText);
+      console.log("Incoming Message:", phoneNumber, messageText);
 
-    //   await pool.query(
-    //     `INSERT INTO messages 
-    //      (phone_number, message_text, message_status, response_id) 
-    //      VALUES ($1,$2,$3,$4)`,
-    //     [phoneNumber, messageText, "received", messageId]
-    //   );
+      await pool.query(
+        `INSERT INTO messages 
+         (phone_number, message_text, message_status, response_id) 
+         VALUES ($1,$2,$3,$4)`,
+        [phoneNumber, messageText, "received", messageId]
+      );
 
-    //   await sendWhatsAppMessage(phoneNumber, "Hello 👋");
+      await sendWhatsAppMessage(phoneNumber, "Hello 👋");
 
-    // }
-if (value?.messages) {
-
-  const messageData = value.messages[0];
-
-  const phoneNumber = messageData.from;
-  const messageId = messageData.id;
-
-  let messageText = null;
-
-  if (messageData.type === "text") {
-    messageText = messageData.text?.body;
-  } else if (messageData.type === "button") {
-    messageText = messageData.button?.text;
-  } else if (messageData.type === "interactive") {
-    messageText =
-      messageData.interactive?.button_reply?.title ||
-      messageData.interactive?.list_reply?.title;
-  } else {
-    messageText = `[${messageData.type} message]`;
-  }
-
-  await pool.query(
-    `INSERT INTO messages 
-     (phone_number, message_text, message_status, response_id) 
-     VALUES ($1,$2,$3,$4)`,
-    [phoneNumber, messageText, "received", messageId]
-  );
-
-  await sendWhatsAppMessage(phoneNumber, "Hello 👋");
-}
+    }
 
     // ===============================
     // 2️⃣ Status Update (Delivered/Read)
