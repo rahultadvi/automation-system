@@ -375,18 +375,19 @@ export const registerUser = async (req, res) => {
     console.log("User created with ID:", user.id);
 
     // 🔥 YAHI IMPORTANT ADD KARNA HAI
-    await pool.query(
-      `INSERT INTO whatsapp_credentials 
-       (user_id, whatsapp_token, phone_number_id) 
-       VALUES ($1, $2, $3)`,
-      [
-        user.id,
-        process.env.DEFAULT_WHATSAPP_TOKEN,
-        process.env.DEFAULT_PHONE_NUMBER_ID
-      ]
-    );
+await pool.query(
+  `INSERT INTO whatsapp_credentials 
+   (user_id, whatsapp_token, phone_number_id) 
+   VALUES ($1, $2, $3)
+   ON CONFLICT (user_id) DO NOTHING`,
+  [
+    user.id,
+    process.env.DEFAULT_WHATSAPP_TOKEN,
+    process.env.DEFAULT_PHONE_NUMBER_ID
+  ]
+);
 
-    console.log("WhatsApp credentials auto-created");
+console.log("WhatsApp credentials ensured for:", user.id);
 
     // Email verification token
     const token = crypto.randomBytes(32).toString("hex");
