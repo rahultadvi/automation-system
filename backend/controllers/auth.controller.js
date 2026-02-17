@@ -219,51 +219,51 @@ import pool from "../config/db.js";
 //   }
 // };
 
-export const registerUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+// export const registerUser = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
 
-    if (!email || !password)
-      return res.status(400).json({ message: "All fields required" });
+//     if (!email || !password)
+//       return res.status(400).json({ message: "All fields required" });
 
-    const existingUser = await findUserByEmail(email);
+//     const existingUser = await findUserByEmail(email);
 
-    if (existingUser)
-      return res.status(400).json({ message: "Email already exists" });
+//     if (existingUser)
+//       return res.status(400).json({ message: "Email already exists" });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+//     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const role = "admin";
-    const createdBy = null;
-    const username = email.split("@")[0];
+//     const role = "admin";
+//     const createdBy = null;
+//     const username = email.split("@")[0];
 
-    const user = await createUser(
-      username,
-      email,
-      hashedPassword,
-      role,
-      createdBy
-    );
+//     const user = await createUser(
+//       username,
+//       email,
+//       hashedPassword,
+//       role,
+//       createdBy
+//     );
 
-    console.log("User created with ID:", user.id);
+//     console.log("User created with ID:", user.id);
 
-    // Generate verification token
-    const token = crypto.randomBytes(32).toString("hex");
-    const expiresAt = new Date(Date.now() + 86400000);
+//     // Generate verification token
+//     const token = crypto.randomBytes(32).toString("hex");
+//     const expiresAt = new Date(Date.now() + 86400000);
 
-    await saveVerificationToken(user.id, token, expiresAt);
+//     await saveVerificationToken(user.id, token, expiresAt);
 
-    const link = `https://automation-system-f5p2.onrender.com/verify-email?token=${token}`;
+//     const link = `https://automation-system-f5p2.onrender.com/verify-email?token=${token}`;
 
-    await sendVerificationEmail(email, link);
-    console.log("Verification email sent to:", email);
+//     await sendVerificationEmail(email, link);
+//     console.log("Verification email sent to:", email);
 
-    res.json({ message: "Verification email sent. Please check your inbox." });
+//     res.json({ message: "Verification email sent. Please check your inbox." });
 
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 
 // export const verifyEmail = async (req, res) => {
@@ -345,6 +345,66 @@ export const verifyEmail = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const registerUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password)
+      return res.status(400).json({ message: "All fields required" });
+
+    const existingUser = await findUserByEmail(email);
+
+    if (existingUser)
+      return res.status(400).json({ message: "Email already exists" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const role = "admin";
+    const createdBy = null;
+    const username = email.split("@")[0];
+
+    const user = await createUser(
+      username,
+      email,
+      hashedPassword,
+      role,
+      createdBy
+    );
+
+    console.log("User created with ID:", user.id);
+
+    // 🔥 YAHI IMPORTANT ADD KARNA HAI
+    await pool.query(
+      `INSERT INTO whatsapp_credentials 
+       (user_id, whatsapp_token, phone_number_id) 
+       VALUES ($1, $2, $3)`,
+      [
+        user.id,
+        process.env.DEFAULT_WHATSAPP_TOKEN,
+        process.env.DEFAULT_PHONE_NUMBER_ID
+      ]
+    );
+
+    console.log("WhatsApp credentials auto-created");
+
+    // Email verification token
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 86400000);
+
+    await saveVerificationToken(user.id, token, expiresAt);
+
+    const link = `https://automation-system-f5p2.onrender.com/verify-email?token=${token}`;
+
+    await sendVerificationEmail(email, link);
+
+    res.json({ message: "Verification email sent. Please check your inbox." });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 
 export const loginUser = async (req, res) => {
