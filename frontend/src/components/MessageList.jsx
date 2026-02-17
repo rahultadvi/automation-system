@@ -62,7 +62,10 @@ const MessageList = () => {
   {
     withCredentials: true
   }
+  
 );
+console.log("API RESPONSE:", res.data);  // 👈 ADD THIS
+setMessages(res.data);
 
         fetchMessages();
       } catch (error) {
