@@ -86,6 +86,9 @@ router.get("/webhook", (req, res) => {
 router.post("/webhook", async (req, res) => {
   try {
 
+    console.log("FULL WEBHOOK:", JSON.stringify(req.body, null, 2));
+
+
     const value = req.body.entry?.[0]?.changes?.[0]?.value;
 
     // ===============================
