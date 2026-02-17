@@ -45,34 +45,27 @@ import pool from "../config/db.js";
 
 //   return response.data;
 // };
-export const sendWhatsAppMessage = async (userId, phoneNumber, messageText) => {
+import { sendWhatsAppMessage } from "../services/whatsapp.service.js";
 
-  const cred = await pool.query(
-    "SELECT whatsapp_token, phone_number_id FROM whatsapp_credentials WHERE user_id = $1",
-    [userId]
-  );
+export const sendMessageController = async (req, res) => {
+  try {
 
-  if (!cred.rows.length) {
-    throw new Error("WhatsApp credentials not found");
+    const { phoneNumber, messageText } = req.body;
+
+    const userId = req.user.id;   // 👈 JWT se
+
+    console.log("Controller User ID:", userId);
+
+    const response = await sendWhatsAppMessage(
+      userId,        // 1️⃣ FIRST
+      phoneNumber,   // 2️⃣ SECOND
+      messageText    // 3️⃣ THIRD
+    );
+
+    res.status(200).json(response);
+
+  } catch (error) {
+    console.error("Send Message Error:", error);
+    res.status(500).json({ message: error.message });
   }
-
-  const { whatsapp_token, phone_number_id } = cred.rows[0];
-
-  const response = await axios.post(
-    `https://graph.facebook.com/v18.0/${phone_number_id}/messages`,
-    {
-      messaging_product: "whatsapp",
-      to: phoneNumber,
-      type: "text",
-      text: { body: messageText }
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${whatsapp_token}`,
-        "Content-Type": "application/json"
-      }
-    }
-  );
-
-  return response.data;
 };
