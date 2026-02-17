@@ -97,88 +97,53 @@ import pool from "../config/db.js";
 // };
 
 export const registerUser = async (req, res) => {
-  const client = await pool.connect();
-
   try {
+
     const { email, password } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password)
       return res.status(400).json({ message: "All fields required" });
-    }
 
     const existingUser = await findUserByEmail(email);
-
-    if (existingUser) {
+    if (existingUser)
       return res.status(400).json({ message: "Email already exists" });
-    }
-
-    // 🔥 ENV CHECK (IMPORTANT)
-    const defaultToken = process.env.WHATSAPP_TOKEN;
-    const defaultPhoneId = process.env.PHONE_NUMBER_ID;
-
-    if (!defaultToken || !defaultPhoneId) {
-      throw new Error("WhatsApp ENV variables missing");
-    }
-
-    await client.query("BEGIN");
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const role = "admin";
-    const createdBy = null;
     const username = email.split("@")[0];
 
     const user = await createUser(
       username,
       email,
       hashedPassword,
-      role,
-      createdBy
+      "admin",
+      null
     );
 
-    console.log("User created with ID:", user.id);
+    console.log("User created:", user.id);
 
-    // ✅ Check if credentials already exist
-    const check = await client.query(
-      "SELECT id FROM whatsapp_credentials WHERE user_id = $1",
-      [user.id]
+    // 🔥 Auto create WhatsApp credentials
+    await pool.query(
+      `INSERT INTO whatsapp_credentials
+       (user_id, whatsapp_token, phone_number_id)
+       VALUES ($1,$2,$3)`,
+      [
+        user.id,
+        process.env.WHATSAPP_TOKEN,
+        process.env.PHONE_NUMBER_ID
+      ]
     );
 
-    if (check.rows.length === 0) {
-      await client.query(
-        `INSERT INTO whatsapp_credentials 
-         (user_id, whatsapp_token, phone_number_id) 
-         VALUES ($1, $2, $3)`,
-        [user.id, defaultToken, defaultPhoneId]
-      );
+    console.log("Credentials created");
 
-      console.log("WhatsApp credentials auto-created");
-    }
-
-    // 🔥 Email verification
-    const token = crypto.randomBytes(32).toString("hex");
-    const expiresAt = new Date(Date.now() + 86400000);
-
-    await saveVerificationToken(user.id, token, expiresAt);
-
-    const link = `https://automation-system-f5p2.onrender.com/verify-email?token=${token}`;
-
-    await sendVerificationEmail(email, link);
-
-    await client.query("COMMIT");
-
-    res.json({
-      message: "Admin registered successfully. Please verify email."
-    });
+    res.json({ message: "Admin registered successfully" });
 
   } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("REGISTER ERROR:", error);
+    console.error(error);
     res.status(500).json({ error: error.message });
-  } finally {
-    client.release();
   }
 };
+
 
 
 
