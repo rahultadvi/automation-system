@@ -17,11 +17,21 @@ const handleSend = async () => {
   try {
     setLoading(true);
 
-    const formattedNumber = phoneNumber.replace(/\D/g, "");
+    let formattedNumber = phoneNumber.replace(/\D/g, "");
 
-    // ✅ Optional validation
-    if (formattedNumber.length < 10) {
-      alert("Invalid phone number");
+    // 🇮🇳 Agar sirf 10 digit dala hai
+    if (formattedNumber.length === 10) {
+      formattedNumber = "91" + formattedNumber;
+    }
+
+    // 🇮🇳 Agar 0 se start ho raha hai
+    if (formattedNumber.length === 11 && formattedNumber.startsWith("0")) {
+      formattedNumber = "91" + formattedNumber.substring(1);
+    }
+
+    // Final validation (India number = 12 digits including 91)
+    if (formattedNumber.length !== 12) {
+      alert("Invalid phone number. Please enter valid Indian number.");
       return;
     }
 
@@ -32,17 +42,15 @@ const handleSend = async () => {
         messageText
       },
       {
-        withCredentials: true   // ⭐ Cookie auth
+        withCredentials: true
       }
     );
-
-    console.log(res.data);
 
     alert("Message Sent ✅");
 
     setPhoneNumber("");
     setMessageText("");
-      if (onMessageSent) onMessageSent();
+    if (onMessageSent) onMessageSent();
     setCharCount(0);
 
   } catch (error) {
@@ -55,6 +63,7 @@ const handleSend = async () => {
     setLoading(false);
   }
 };
+
 
   const handleMessageChange = (e) => {
     const text = e.target.value;
