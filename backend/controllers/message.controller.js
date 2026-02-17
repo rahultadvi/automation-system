@@ -3,55 +3,72 @@ import { sendWhatsAppMessage } from "../services/whatsapp.service.js";
 import { saveMessageService } from "../services/message.service.js";
 
 
-// ⭐ Send Message
+
 // export const sendMessageController = async (req, res) => {
 //   try {
-
 //     const { phoneNumber, messageText } = req.body;
-//     const { id: userId } = req.user;
 
-//     if (!phoneNumber || !messageText) {
-//       return res.status(400).json({
-//         message: "Phone number and message text are required"
-//       });
-//     }
+//     const userId = req.user.id;
 
-//     const whatsappResponse = await sendWhatsAppMessage(phoneNumber, messageText);
+//     console.log("CORRECT USER ID:", userId);
+//     console.log("PHONE:", phoneNumber);
 
-//     const whatsappMessageId =
-//       whatsappResponse?.messages?.[0]?.id || null;
+//     const response = await sendWhatsAppMessage(
+//       userId,
+//       phoneNumber,
+//       messageText
+//     );
 
-//     const savedMessage = await saveMessageService(
+//     await saveMessageService(
 //       userId,
 //       phoneNumber,
 //       messageText,
 //       "sent",
-//       whatsappMessageId
+//       response?.messages?.[0]?.id || null
 //     );
 
 //     res.status(200).json({
 //       message: "Message sent successfully",
-//       data: savedMessage
+//       data: response
 //     });
 
 //   } catch (error) {
-
 //     console.error("Send Message Error:", error);
-
 //     res.status(500).json({
-//       message: "Failed to send message",
-//       error: error.message
+//       message: error.message
 //     });
 //   }
 // };
+
 export const sendMessageController = async (req, res) => {
   try {
     const { phoneNumber, messageText } = req.body;
 
-    const userId = req.user.id;
+    if (!phoneNumber || !messageText) {
+      return res.status(400).json({
+        message: "Phone number and message text are required"
+      });
+    }
 
-    console.log("CORRECT USER ID:", userId);
-    console.log("PHONE:", phoneNumber);
+    let userId = req.user.id;
+
+    // 🔥 Agar role user hai to uska admin find karo
+    if (req.user.role === "user") {
+      const result = await pool.query(
+        "SELECT created_by FROM users WHERE id = $1",
+        [req.user.id]
+      );
+
+      if (!result.rows.length || !result.rows[0].created_by) {
+        return res.status(400).json({
+          message: "Admin WhatsApp credentials not found"
+        });
+      }
+
+      userId = result.rows[0].created_by; // 👈 Admin ID use karo
+    }
+
+    console.log("FINAL USER ID USED FOR WA:", userId);
 
     const response = await sendWhatsAppMessage(
       userId,
@@ -79,6 +96,7 @@ export const sendMessageController = async (req, res) => {
     });
   }
 };
+
 
 // ⭐ Get All Messages
 export const getMessagesController = async (req, res) => {
