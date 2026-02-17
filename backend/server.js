@@ -16,6 +16,10 @@ import inviteRoutes from "./router/invite.routes.js";
 import pool from "./config/db.js";
 const PORT = process.env.PORT || 5000;
 
+console.log("ENV TOKEN:", process.env.WHATSAPP_TOKEN);
+console.log("ENV PHONE:", process.env.PHONE_NUMBER_ID);
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
