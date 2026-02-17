@@ -48,10 +48,13 @@ import pool from "../config/db.js";
 
 export const sendWhatsAppMessage = async (userId, phoneNumber, messageText) => {
 
+
+  console.log("USER ID RECEIVED:", userId);
   const cred = await pool.query(
     "SELECT whatsapp_token, phone_number_id FROM whatsapp_credentials WHERE user_id = $1",
     [userId]
   );
+  console.log("DB MATCH:", cred.rows);
 
   if (!cred.rows.length) {
     throw new Error("WhatsApp credentials not found");
