@@ -12,9 +12,9 @@ export const sendWhatsAppMessage = async (phoneNumber, messageText) => {
     throw new Error("WhatsApp credentials not found");
   }
 
-  const { whatsapp_token, phone_number_id } = cred.rows[0];
+  const { whatsapp_token1, phone_number_id } = cred.rows[0];
 
-    console.log("👉 Token:", whatsapp_token);
+    console.log("👉 Token:", whatsapp_token1);
   console.log("👉 Phone ID:", phone_number_id);
 
   const url = `https://graph.facebook.com/v18.0/${phone_number_id}/messages`;
@@ -33,7 +33,7 @@ const response = await axios.post(
   },
   {
     headers: {
-      Authorization: `Bearer ${whatsapp_token}`,
+      Authorization: `Bearer ${whatsapp_token1}`,
       "Content-Type": "application/json"
     }
   }
