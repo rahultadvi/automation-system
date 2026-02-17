@@ -97,16 +97,30 @@ import pool from "../config/db.js";
 // };
 
 export const registerUser = async (req, res) => {
+  const client = await pool.connect();
+
   try {
     const { email, password } = req.body;
 
-    if (!email || !password)
+    if (!email || !password) {
       return res.status(400).json({ message: "All fields required" });
+    }
 
     const existingUser = await findUserByEmail(email);
 
-    if (existingUser)
+    if (existingUser) {
       return res.status(400).json({ message: "Email already exists" });
+    }
+
+    // 🔥 ENV CHECK (IMPORTANT)
+    const defaultToken = process.env.WHATSAPP_TOKEN;
+    const defaultPhoneId = process.env.PHONE_NUMBER_ID;
+
+    if (!defaultToken || !defaultPhoneId) {
+      throw new Error("WhatsApp ENV variables missing");
+    }
+
+    await client.query("BEGIN");
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -124,21 +138,24 @@ export const registerUser = async (req, res) => {
 
     console.log("User created with ID:", user.id);
 
-    // 🔥 YAHI IMPORTANT ADD KARNA HAI
-    await pool.query(
-      `INSERT INTO whatsapp_credentials 
-       (user_id, whatsapp_token, phone_number_id) 
-       VALUES ($1, $2, $3)`,
-      [
-        user.id,
-        process.env.whatsapp_token,
-        process.env.phone_number_id
-      ]
+    // ✅ Check if credentials already exist
+    const check = await client.query(
+      "SELECT id FROM whatsapp_credentials WHERE user_id = $1",
+      [user.id]
     );
 
-    console.log("WhatsApp credentials auto-created");
+    if (check.rows.length === 0) {
+      await client.query(
+        `INSERT INTO whatsapp_credentials 
+         (user_id, whatsapp_token, phone_number_id) 
+         VALUES ($1, $2, $3)`,
+        [user.id, defaultToken, defaultPhoneId]
+      );
 
-    // Email verification token
+      console.log("WhatsApp credentials auto-created");
+    }
+
+    // 🔥 Email verification
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 86400000);
 
@@ -148,12 +165,21 @@ export const registerUser = async (req, res) => {
 
     await sendVerificationEmail(email, link);
 
-    res.json({ message: "Verification email sent. Please check your inbox." });
+    await client.query("COMMIT");
+
+    res.json({
+      message: "Admin registered successfully. Please verify email."
+    });
 
   } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("REGISTER ERROR:", error);
     res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
   }
 };
+
 
 
 export const verifyEmail = async (req, res) => {
