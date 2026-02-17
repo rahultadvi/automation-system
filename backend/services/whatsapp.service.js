@@ -3,6 +3,8 @@ import pool from "../config/db.js";
 
 
 export const sendWhatsAppMessage = async (userId, phoneNumber, messageText) => {
+  console.log("WHATSAPP API SENDING TO:", phoneNumber);
+
 
   console.log("USER ID RECEIVED:", userId);
 
