@@ -51,7 +51,8 @@ export const sendWhatsAppMessage = async (userId, phoneNumber, messageText) => {
     "SELECT whatsapp_token, phone_number_id FROM whatsapp_credentials WHERE user_id = $1",
     [userId]
   );
-
+  const userId = req.user.id;
+  console.log("👉 User ID:", userId);
   if (!cred.rows.length) {
     throw new Error("WhatsApp credentials not found");
   }
